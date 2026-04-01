@@ -22,18 +22,26 @@ jobs:
           import os
           import json
 
-          carpeta = "logos"
+          base = "logos"
           extensiones = (".png", ".jpg", ".jpeg", ".webp", ".svg")
+          manifest = {}
 
-          archivos = []
-          if os.path.isdir(carpeta):
-              for nombre in sorted(os.listdir(carpeta)):
-                  ruta = os.path.join(carpeta, nombre)
-                  if os.path.isfile(ruta) and nombre.lower().endswith(extensiones):
-                      archivos.append(f"logos/{nombre}")
+          if os.path.isdir(base):
+              for carpeta in sorted(os.listdir(base)):
+                  ruta_carpeta = os.path.join(base, carpeta)
+
+                  if os.path.isdir(ruta_carpeta):
+                      archivos = []
+                      for nombre in sorted(os.listdir(ruta_carpeta)):
+                          ruta_archivo = os.path.join(ruta_carpeta, nombre)
+                          if os.path.isfile(ruta_archivo) and nombre.lower().endswith(extensiones):
+                              archivos.append(f"logos/{carpeta}/{nombre}")
+
+                      if archivos:
+                          manifest[carpeta] = archivos
 
           with open("manifest.json", "w", encoding="utf-8") as f:
-              json.dump(archivos, f, ensure_ascii=False, indent=2)
+              json.dump(manifest, f, ensure_ascii=False, indent=2)
           PY
 
       - name: Subir cambios si hubo actualización

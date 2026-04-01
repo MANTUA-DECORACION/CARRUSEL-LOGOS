@@ -5,9 +5,9 @@ function getParams() {
   return {
     grupo: p.get('grupo'),
     mode: p.get('mode') || 'panel',
-    h: num(p.get('h'), 140),
-    logo: num(p.get('logo'), 80),
-    gap: num(p.get('gap'), 16),
+    h: num(p.get('h'), 72),
+    logo: num(p.get('logo'), 42),
+    gap: num(p.get('gap'), 14),
     speed: num(p.get('speed'), 90),
     bg: p.get('bg') || 'ffffff',
   };
@@ -57,11 +57,15 @@ function applyEmbedHeight(height) {
   document.documentElement.style.minHeight = h;
   document.documentElement.style.maxHeight = h;
   document.documentElement.style.overflow = 'hidden';
+  document.documentElement.style.margin = '0';
+  document.documentElement.style.padding = '0';
 
   document.body.style.height = h;
   document.body.style.minHeight = h;
   document.body.style.maxHeight = h;
   document.body.style.overflow = 'hidden';
+  document.body.style.margin = '0';
+  document.body.style.padding = '0';
 }
 
 async function buildMarquee(target, logos, config, grupo) {
@@ -80,7 +84,7 @@ async function buildMarquee(target, logos, config, grupo) {
   const marquee = document.createElement('div');
   marquee.className = 'logos-marquee';
 
-  const cellWidth = Math.max(130, Math.round(config.logo * 2.2));
+  const cellWidth = Math.max(110, Math.round(config.logo * 2.1));
 
   marquee.style.setProperty('--logo-max', `${config.logo}px`);
   marquee.style.setProperty('--gap', `${config.gap}px`);
@@ -160,7 +164,7 @@ function buildEmbedUrl(grupo, config) {
 }
 
 function buildIframeCode(url, h) {
-  return `<div style="width:100%;max-width:100%;height:${h}px;overflow:hidden;line-height:0;margin:0;padding:0;">
+  return `<div style="width:100%;height:${h}px;max-height:${h}px;overflow:hidden;position:relative;margin:0;padding:0;line-height:0;">
   <iframe
     src="${url}"
     width="100%"
@@ -168,7 +172,7 @@ function buildIframeCode(url, h) {
     frameborder="0"
     scrolling="no"
     allowfullscreen
-    style="display:block;width:100%;height:${h}px;border:0;margin:0;padding:0;overflow:hidden;line-height:0;background:transparent;">
+    style="position:absolute;top:0;left:0;width:100%;height:${h}px;max-height:${h}px;border:0;margin:0;padding:0;overflow:hidden;display:block;line-height:0;background:transparent;">
   </iframe>
 </div>`;
 }
@@ -204,7 +208,7 @@ async function renderPanel(manifest) {
   const grid = document.getElementById('cardsGrid');
 
   for (const [grupo, logos] of groups) {
-    const defaults = { h: 140, logo: 80, gap: 16, speed: 90, bg: 'ffffff' };
+    const defaults = { h: 72, logo: 42, gap: 14, speed: 90, bg: 'ffffff' };
 
     const card = document.createElement('article');
     card.className = 'carousel-card';
@@ -221,11 +225,11 @@ async function renderPanel(manifest) {
       <div class="controls-grid">
         <div class="control-box">
           <label>Alto carrusel</label>
-          <input type="number" min="70" value="${defaults.h}" data-role="h">
+          <input type="number" min="50" value="${defaults.h}" data-role="h">
         </div>
         <div class="control-box">
           <label>Logo máximo</label>
-          <input type="number" min="30" value="${defaults.logo}" data-role="logo">
+          <input type="number" min="20" value="${defaults.logo}" data-role="logo">
         </div>
         <div class="control-box">
           <label>Separación</label>
@@ -281,7 +285,9 @@ async function renderPanel(manifest) {
       preview.src = url;
       preview.height = config.h;
       preview.style.height = `${config.h}px`;
+      preview.style.maxHeight = `${config.h}px`;
       preview.style.overflow = 'hidden';
+      preview.style.display = 'block';
 
       linkField.value = url;
       iframeField.value = iframe;

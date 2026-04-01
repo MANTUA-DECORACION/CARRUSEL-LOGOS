@@ -1,0 +1,64 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: transparent;
+  font-family: Arial, sans-serif;
+}
+
+.logos-section {
+  width: 100%;
+  overflow: hidden;
+  background: #ffffff;
+  padding: 18px 0;
+}
+
+.logos-track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  animation: scroll 35s linear infinite;
+}
+
+.logos-group {
+  display: flex;
+  align-items: center;
+  gap: 56px;
+  padding-right: 56px;
+}
+
+.logo-item {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-item img {
+  height: 54px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+@keyframes scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 768px) {
+  .logos-group {
+    gap: 32px;
+    padding-right: 32px;
+  }
+
+  .logo-item img {
+    height: 40px;
+  }
+}

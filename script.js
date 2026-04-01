@@ -46,10 +46,22 @@ function waitImages(container) {
 
 function applyEmbedHeight(height) {
   const h = `${height}px`;
+
   document.documentElement.style.setProperty('--embed-h', h);
   document.body.style.setProperty('--embed-h', h);
+
   document.documentElement.classList.add('embed-mode');
   document.body.classList.add('embed-mode');
+
+  document.documentElement.style.height = h;
+  document.documentElement.style.minHeight = h;
+  document.documentElement.style.maxHeight = h;
+  document.documentElement.style.overflow = 'hidden';
+
+  document.body.style.height = h;
+  document.body.style.minHeight = h;
+  document.body.style.maxHeight = h;
+  document.body.style.overflow = 'hidden';
 }
 
 async function buildMarquee(target, logos, config, grupo) {
@@ -86,6 +98,7 @@ async function buildMarquee(target, logos, config, grupo) {
       img.src = ruta;
       img.alt = `Logo ${grupo}`;
       img.loading = 'eager';
+      img.decoding = 'async';
 
       item.appendChild(img);
       group.appendChild(item);
@@ -114,6 +127,7 @@ async function buildMarquee(target, logos, config, grupo) {
       img.src = ruta;
       img.alt = `Logo ${grupo}`;
       img.loading = 'eager';
+      img.decoding = 'async';
 
       item.appendChild(img);
       baseGroup.appendChild(item);
@@ -126,8 +140,9 @@ async function buildMarquee(target, logos, config, grupo) {
   const clone = baseGroup.cloneNode(true);
   marquee.appendChild(clone);
 
-  marquee.style.setProperty('--group-width', `${baseGroup.offsetWidth}px`);
-  marquee.style.setProperty('--duration', `${baseGroup.offsetWidth / config.speed}s`);
+  const groupWidth = baseGroup.offsetWidth;
+  marquee.style.setProperty('--group-width', `${groupWidth}px`);
+  marquee.style.setProperty('--duration', `${groupWidth / config.speed}s`);
 }
 
 function buildEmbedUrl(grupo, config) {
@@ -140,11 +155,22 @@ function buildEmbedUrl(grupo, config) {
     speed: String(config.speed),
     bg: config.bg.replace('#', ''),
   });
+
   return `${BASE_URL}?${q.toString()}`;
 }
 
 function buildIframeCode(url, h) {
-  return `<iframe src="${url}" width="100%" height="${h}" style="border:0;overflow:hidden;display:block;" scrolling="no"></iframe>`;
+  return `<div style="width:100%;max-width:100%;height:${h}px;overflow:hidden;line-height:0;margin:0;padding:0;">
+  <iframe
+    src="${url}"
+    width="100%"
+    height="${h}"
+    frameborder="0"
+    scrolling="no"
+    allowfullscreen
+    style="display:block;width:100%;height:${h}px;border:0;margin:0;padding:0;overflow:hidden;line-height:0;background:transparent;">
+  </iframe>
+</div>`;
 }
 
 async function renderPanel(manifest) {
@@ -189,7 +215,7 @@ async function renderPanel(manifest) {
       </div>
 
       <div class="preview-shell">
-        <iframe class="embed-frame" title="Preview ${grupo}"></iframe>
+        <iframe class="embed-frame" title="Preview ${grupo}" scrolling="no"></iframe>
       </div>
 
       <div class="controls-grid">
@@ -219,7 +245,7 @@ async function renderPanel(manifest) {
 
       <div class="output-label">Iframe</div>
       <div class="output-row">
-        <textarea readonly rows="3" data-role="iframe"></textarea>
+        <textarea readonly rows="4" data-role="iframe"></textarea>
         <button class="copy-btn" data-copy="iframe">Copiar</button>
       </div>
 
@@ -254,6 +280,9 @@ async function renderPanel(manifest) {
 
       preview.src = url;
       preview.height = config.h;
+      preview.style.height = `${config.h}px`;
+      preview.style.overflow = 'hidden';
+
       linkField.value = url;
       iframeField.value = iframe;
       openBtn.onclick = () => window.open(url, '_blank');
@@ -267,13 +296,18 @@ async function renderPanel(manifest) {
       btn.addEventListener('click', async () => {
         const type = btn.dataset.copy;
         const text = type === 'link' ? linkField.value : iframeField.value;
+
         try {
           await navigator.clipboard.writeText(text);
           btn.textContent = 'Copiado';
-          setTimeout(() => btn.textContent = 'Copiar', 1000);
+          setTimeout(() => {
+            btn.textContent = 'Copiar';
+          }, 1000);
         } catch {
           btn.textContent = 'Error';
-          setTimeout(() => btn.textContent = 'Copiar', 1000);
+          setTimeout(() => {
+            btn.textContent = 'Copiar';
+          }, 1000);
         }
       });
     });
@@ -312,8 +346,10 @@ async function init() {
 }
 
 window.addEventListener('load', init);
+
 window.addEventListener('resize', () => {
   const params = getParams();
+
   if (params.mode === 'embed' && params.grupo) {
     clearTimeout(window.__mantuaResize);
     window.__mantuaResize = setTimeout(init, 220);

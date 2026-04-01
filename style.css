@@ -7,18 +7,30 @@ html, body {
   padding: 0;
   background: transparent;
   font-family: Arial, sans-serif;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 body {
   width: 100%;
+  background: #ffffff;
 }
 
-.logos-section {
+.logos-page {
   width: 100%;
-  background: #ffffff;
-  padding: 14px 0;
-  overflow: hidden;
+  padding: 20px 0;
+}
+
+.grupo-section {
+  width: 100%;
+  margin-bottom: 28px;
+}
+
+.grupo-title {
+  margin: 0 0 12px 0;
+  padding: 0 20px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #222;
 }
 
 .logos-viewport {
@@ -45,11 +57,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 28px;
+  padding: 0 20px;
 }
 
 .logo-item img {
-  height: 100px;
+  height: 80px;
   width: auto;
   max-width: none;
   object-fit: contain;
@@ -66,15 +78,25 @@ body {
 }
 
 @media (max-width: 768px) {
-  .logos-section {
-    padding: 10px 0;
+  .logos-page {
+    padding: 14px 0;
+  }
+
+  .grupo-section {
+    margin-bottom: 22px;
+  }
+
+  .grupo-title {
+    font-size: 15px;
+    padding: 0 14px;
+    margin-bottom: 8px;
   }
 
   .logo-item {
-    padding: 0 18px;
+    padding: 0 12px;
   }
 
   .logo-item img {
-    height: 100px;
+    height: 52px;
   }
 }

@@ -50,7 +50,7 @@ async function buildMarquee(target, logos, config, grupo) {
   const section = document.createElement('section');
   section.className = 'logos-section';
   section.style.setProperty('--embed-bg', normalizeBg(config.bg));
-  section.style.setProperty('--embed-pad', `${Math.max(8, Math.round((config.h - config.logo) / 2.4))}px`);
+  section.style.setProperty('--embed-h', `${config.h}px`);
 
   const viewport = document.createElement('div');
   viewport.className = 'logos-viewport';
@@ -58,13 +58,10 @@ async function buildMarquee(target, logos, config, grupo) {
   const marquee = document.createElement('div');
   marquee.className = 'logos-marquee';
 
-  const cellHeight = Math.max(config.logo + 16, config.h - 10);
   const cellWidth = Math.max(130, Math.round(config.logo * 2.2));
 
-  section.style.height = `${config.h}px`;
   marquee.style.setProperty('--logo-max', `${config.logo}px`);
   marquee.style.setProperty('--gap', `${config.gap}px`);
-  marquee.style.setProperty('--cell-height', `${cellHeight}px`);
   marquee.style.setProperty('--cell-width', `${cellWidth}px`);
 
   const createGroup = () => {

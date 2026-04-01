@@ -7,30 +7,22 @@ html, body {
   padding: 0;
   background: transparent;
   font-family: Arial, sans-serif;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 body {
   width: 100%;
+}
+
+.embed-page {
+  width: 100%;
+}
+
+.logos-section {
+  width: 100%;
   background: #ffffff;
-}
-
-.logos-page {
-  width: 100%;
-  padding: 20px 0;
-}
-
-.grupo-section {
-  width: 100%;
-  margin-bottom: 28px;
-}
-
-.grupo-title {
-  margin: 0 0 12px 0;
-  padding: 0 20px;
-  font-size: 18px;
-  font-weight: 700;
-  color: #222;
+  padding: 16px 0;
+  overflow: hidden;
 }
 
 .logos-viewport {
@@ -57,13 +49,16 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 20px;
+  width: 180px;
+  height: 96px;
+  padding: 0 16px;
 }
 
 .logo-item img {
-  height: 80px;
+  max-width: 100%;
+  max-height: 80px;
   width: auto;
-  max-width: none;
+  height: auto;
   object-fit: contain;
   display: block;
 }
@@ -78,25 +73,17 @@ body {
 }
 
 @media (max-width: 768px) {
-  .logos-page {
-    padding: 14px 0;
-  }
-
-  .grupo-section {
-    margin-bottom: 22px;
-  }
-
-  .grupo-title {
-    font-size: 15px;
-    padding: 0 14px;
-    margin-bottom: 8px;
+  .logos-section {
+    padding: 10px 0;
   }
 
   .logo-item {
-    padding: 0 12px;
+    width: 130px;
+    height: 72px;
+    padding: 0 10px;
   }
 
   .logo-item img {
-    height: 52px;
+    max-height: 52px;
   }
 }

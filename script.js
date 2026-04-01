@@ -1,71 +1,90 @@
-async function cargarLogos() {
+async function cargarCarruseles() {
   try {
     const respuesta = await fetch('manifest.json');
-    const logos = await respuesta.json();
+    const grupos = await respuesta.json();
 
-    const marquee = document.getElementById('logosMarquee');
-    if (!marquee) return;
+    const page = document.getElementById('logosPage');
+    page.innerHTML = '';
 
-    marquee.innerHTML = '';
+    if (!grupos || typeof grupos !== 'object') return;
 
-    if (!Array.isArray(logos) || logos.length === 0) return;
+    for (const [nombreGrupo, logos] of Object.entries(grupos)) {
+      if (!Array.isArray(logos) || logos.length === 0) continue;
 
-    const crearGrupo = () => {
-      const grupo = document.createElement('div');
-      grupo.className = 'logos-group';
+      const bloque = document.createElement('section');
+      bloque.className = 'grupo-section';
 
-      logos.forEach((ruta) => {
-        const item = document.createElement('div');
-        item.className = 'logo-item';
+      const titulo = document.createElement('h2');
+      titulo.className = 'grupo-title';
+      titulo.textContent = nombreGrupo;
 
-        const img = document.createElement('img');
-        img.src = ruta;
-        img.alt = 'Logo empresa';
-        img.loading = 'eager';
+      const viewport = document.createElement('div');
+      viewport.className = 'logos-viewport';
 
-        item.appendChild(img);
-        grupo.appendChild(item);
-      });
+      const marquee = document.createElement('div');
+      marquee.className = 'logos-marquee';
 
-      return grupo;
-    };
+      const crearGrupo = () => {
+        const grupo = document.createElement('div');
+        grupo.className = 'logos-group';
 
-    const grupoBase = crearGrupo();
-    marquee.appendChild(grupoBase);
+        logos.forEach((ruta) => {
+          const item = document.createElement('div');
+          item.className = 'logo-item';
 
-    await esperarImagenes(grupoBase);
+          const img = document.createElement('img');
+          img.src = ruta;
+          img.alt = `Logo ${nombreGrupo}`;
+          img.loading = 'eager';
 
-    let anchoGrupo = grupoBase.offsetWidth;
-    const anchoViewport = window.innerWidth;
+          item.appendChild(img);
+          grupo.appendChild(item);
+        });
 
-    while (anchoGrupo < anchoViewport * 1.5) {
-      logos.forEach((ruta) => {
-        const item = document.createElement('div');
-        item.className = 'logo-item';
+        return grupo;
+      };
 
-        const img = document.createElement('img');
-        img.src = ruta;
-        img.alt = 'Logo empresa';
-        img.loading = 'eager';
-
-        item.appendChild(img);
-        grupoBase.appendChild(item);
-      });
+      const grupoBase = crearGrupo();
+      marquee.appendChild(grupoBase);
+      viewport.appendChild(marquee);
+      bloque.appendChild(titulo);
+      bloque.appendChild(viewport);
+      page.appendChild(bloque);
 
       await esperarImagenes(grupoBase);
-      anchoGrupo = grupoBase.offsetWidth;
+
+      let anchoGrupo = grupoBase.offsetWidth;
+      const anchoViewport = window.innerWidth;
+
+      while (anchoGrupo < anchoViewport * 1.5) {
+        logos.forEach((ruta) => {
+          const item = document.createElement('div');
+          item.className = 'logo-item';
+
+          const img = document.createElement('img');
+          img.src = ruta;
+          img.alt = `Logo ${nombreGrupo}`;
+          img.loading = 'eager';
+
+          item.appendChild(img);
+          grupoBase.appendChild(item);
+        });
+
+        await esperarImagenes(grupoBase);
+        anchoGrupo = grupoBase.offsetWidth;
+      }
+
+      const clon = grupoBase.cloneNode(true);
+      marquee.appendChild(clon);
+
+      marquee.style.setProperty('--group-width', `${grupoBase.offsetWidth}px`);
+
+      const velocidad = 90;
+      const duracion = grupoBase.offsetWidth / velocidad;
+      marquee.style.setProperty('--duration', `${duracion}s`);
     }
-
-    const clon = grupoBase.cloneNode(true);
-    marquee.appendChild(clon);
-
-    marquee.style.setProperty('--group-width', `${grupoBase.offsetWidth}px`);
-
-    const velocidad = 90;
-    const duracion = grupoBase.offsetWidth / velocidad;
-    marquee.style.setProperty('--duration', `${duracion}s`);
   } catch (error) {
-    console.error('Error al cargar logos:', error);
+    console.error('Error al cargar carruseles:', error);
   }
 }
 
@@ -83,10 +102,10 @@ function esperarImagenes(contenedor) {
   );
 }
 
-window.addEventListener('load', cargarLogos);
+window.addEventListener('load', cargarCarruseles);
 window.addEventListener('resize', () => {
   clearTimeout(window.__logosResizeTimer);
   window.__logosResizeTimer = setTimeout(() => {
-    cargarLogos();
+    cargarCarruseles();
   }, 200);
 });

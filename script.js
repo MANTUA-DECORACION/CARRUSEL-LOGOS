@@ -1,90 +1,75 @@
-async function cargarCarruseles() {
+async function cargarCarrusel() {
   try {
+    const params = new URLSearchParams(window.location.search);
+    const grupo = params.get('grupo');
+
     const respuesta = await fetch('manifest.json');
-    const grupos = await respuesta.json();
+    const manifest = await respuesta.json();
 
-    const page = document.getElementById('logosPage');
-    page.innerHTML = '';
+    const marquee = document.getElementById('logosMarquee');
+    marquee.innerHTML = '';
 
-    if (!grupos || typeof grupos !== 'object') return;
+    if (!grupo) return;
+    if (!manifest[grupo] || !Array.isArray(manifest[grupo]) || manifest[grupo].length === 0) return;
 
-    for (const [nombreGrupo, logos] of Object.entries(grupos)) {
-      if (!Array.isArray(logos) || logos.length === 0) continue;
+    const logos = manifest[grupo];
 
-      const bloque = document.createElement('section');
-      bloque.className = 'grupo-section';
+    const crearGrupo = () => {
+      const grupoNode = document.createElement('div');
+      grupoNode.className = 'logos-group';
 
-      const titulo = document.createElement('h2');
-      titulo.className = 'grupo-title';
-      titulo.textContent = nombreGrupo;
+      logos.forEach((ruta) => {
+        const item = document.createElement('div');
+        item.className = 'logo-item';
 
-      const viewport = document.createElement('div');
-      viewport.className = 'logos-viewport';
+        const img = document.createElement('img');
+        img.src = ruta;
+        img.alt = `Logo ${grupo}`;
+        img.loading = 'eager';
 
-      const marquee = document.createElement('div');
-      marquee.className = 'logos-marquee';
+        item.appendChild(img);
+        grupoNode.appendChild(item);
+      });
 
-      const crearGrupo = () => {
-        const grupo = document.createElement('div');
-        grupo.className = 'logos-group';
+      return grupoNode;
+    };
 
-        logos.forEach((ruta) => {
-          const item = document.createElement('div');
-          item.className = 'logo-item';
+    const grupoBase = crearGrupo();
+    marquee.appendChild(grupoBase);
 
-          const img = document.createElement('img');
-          img.src = ruta;
-          img.alt = `Logo ${nombreGrupo}`;
-          img.loading = 'eager';
+    await esperarImagenes(grupoBase);
 
-          item.appendChild(img);
-          grupo.appendChild(item);
-        });
+    let anchoGrupo = grupoBase.offsetWidth;
+    const anchoViewport = window.innerWidth;
 
-        return grupo;
-      };
+    while (anchoGrupo < anchoViewport * 1.5) {
+      logos.forEach((ruta) => {
+        const item = document.createElement('div');
+        item.className = 'logo-item';
 
-      const grupoBase = crearGrupo();
-      marquee.appendChild(grupoBase);
-      viewport.appendChild(marquee);
-      bloque.appendChild(titulo);
-      bloque.appendChild(viewport);
-      page.appendChild(bloque);
+        const img = document.createElement('img');
+        img.src = ruta;
+        img.alt = `Logo ${grupo}`;
+        img.loading = 'eager';
+
+        item.appendChild(img);
+        grupoBase.appendChild(item);
+      });
 
       await esperarImagenes(grupoBase);
-
-      let anchoGrupo = grupoBase.offsetWidth;
-      const anchoViewport = window.innerWidth;
-
-      while (anchoGrupo < anchoViewport * 1.5) {
-        logos.forEach((ruta) => {
-          const item = document.createElement('div');
-          item.className = 'logo-item';
-
-          const img = document.createElement('img');
-          img.src = ruta;
-          img.alt = `Logo ${nombreGrupo}`;
-          img.loading = 'eager';
-
-          item.appendChild(img);
-          grupoBase.appendChild(item);
-        });
-
-        await esperarImagenes(grupoBase);
-        anchoGrupo = grupoBase.offsetWidth;
-      }
-
-      const clon = grupoBase.cloneNode(true);
-      marquee.appendChild(clon);
-
-      marquee.style.setProperty('--group-width', `${grupoBase.offsetWidth}px`);
-
-      const velocidad = 90;
-      const duracion = grupoBase.offsetWidth / velocidad;
-      marquee.style.setProperty('--duration', `${duracion}s`);
+      anchoGrupo = grupoBase.offsetWidth;
     }
+
+    const clon = grupoBase.cloneNode(true);
+    marquee.appendChild(clon);
+
+    marquee.style.setProperty('--group-width', `${grupoBase.offsetWidth}px`);
+
+    const velocidad = 90;
+    const duracion = grupoBase.offsetWidth / velocidad;
+    marquee.style.setProperty('--duration', `${duracion}s`);
   } catch (error) {
-    console.error('Error al cargar carruseles:', error);
+    console.error('Error al cargar carrusel:', error);
   }
 }
 
@@ -102,10 +87,10 @@ function esperarImagenes(contenedor) {
   );
 }
 
-window.addEventListener('load', cargarCarruseles);
+window.addEventListener('load', cargarCarrusel);
 window.addEventListener('resize', () => {
   clearTimeout(window.__logosResizeTimer);
   window.__logosResizeTimer = setTimeout(() => {
-    cargarCarruseles();
+    cargarCarrusel();
   }, 200);
 });

@@ -2,27 +2,181 @@
   box-sizing: border-box;
 }
 
+:root {
+  --page-max: 1200px;
+  --card-radius: 18px;
+  --border: #e7e7e7;
+  --text: #202020;
+  --muted: #666;
+  --bg: #f7f7f7;
+  --white: #fff;
+}
+
 html, body {
   margin: 0;
   padding: 0;
-  background: transparent;
   font-family: Arial, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+body.embed-mode {
+  background: transparent;
   overflow: hidden;
 }
 
-body {
+#app {
   width: 100%;
+}
+
+.panel-page {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 28px 18px 40px;
+}
+
+.panel-header {
+  margin-bottom: 22px;
+}
+
+.panel-title {
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.panel-subtitle {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+.carousel-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--card-radius);
+  padding: 18px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.04);
+}
+
+.carousel-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.carousel-card-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.carousel-card-count {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.preview-shell {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #fff;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.embed-frame {
+  width: 100%;
+  border: 0;
+  display: block;
+  background: #fff;
+}
+
+.controls-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.control-box label {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+
+.control-box input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 9px 10px;
+  font-size: 14px;
+  background: #fff;
+}
+
+.output-label {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 10px 0 6px;
+}
+
+.output-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.output-row textarea,
+.output-row input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 13px;
+  background: #fafafa;
+  resize: vertical;
+  min-height: 42px;
+}
+
+.copy-btn,
+.open-btn {
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  background: #202020;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.actions-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .embed-page {
   width: 100%;
+  overflow: hidden;
+  background: transparent;
 }
 
 .logos-section {
   width: 100%;
-  background: #ffffff;
-  padding: 16px 0;
   overflow: hidden;
+  background: var(--embed-bg, #ffffff);
+  padding: var(--embed-pad, 14px) 0;
 }
 
 .logos-viewport {
@@ -49,41 +203,61 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 180px;
-  height: 96px;
-  padding: 0 16px;
+  width: var(--cell-width, 180px);
+  height: var(--cell-height, 96px);
+  padding: 0 var(--gap, 16px);
 }
 
 .logo-item img {
   max-width: 100%;
-  max-height: 80px;
+  max-height: var(--logo-max, 80px);
   width: auto;
   height: auto;
   object-fit: contain;
   display: block;
 }
 
+.empty-state {
+  max-width: 900px;
+  margin: 50px auto;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 24px;
+}
+
+.empty-state h2 {
+  margin-top: 0;
+}
+
+.code {
+  background: #f3f3f3;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-family: monospace;
+}
+
 @keyframes marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(calc(-1 * var(--group-width, 1000px)));
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(-1 * var(--group-width, 1000px))); }
+}
+
+@media (max-width: 900px) {
+  .controls-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 768px) {
-  .logos-section {
-    padding: 10px 0;
+  .panel-title {
+    font-size: 22px;
   }
 
-  .logo-item {
-    width: 130px;
-    height: 72px;
-    padding: 0 10px;
+  .carousel-card {
+    padding: 14px;
   }
 
-  .logo-item img {
-    max-height: 52px;
+  .controls-grid {
+    grid-template-columns: 1fr 1fr;
   }
 }

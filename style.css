@@ -20,16 +20,26 @@ html, body {
   background: var(--bg);
 }
 
-body.embed-mode {
+body.embed-mode,
+html.embed-mode {
+  margin: 0;
+  padding: 0;
   background: transparent;
-  overflow: hidden;
-  height: 100vh;
+  overflow: hidden !important;
+  height: var(--embed-h, 140px) !important;
+  min-height: var(--embed-h, 140px) !important;
+  max-height: var(--embed-h, 140px) !important;
 }
 
 body.embed-mode #app,
 body.embed-mode .embed-page {
-  height: 100vh;
-  overflow: hidden;
+  width: 100%;
+  height: var(--embed-h, 140px) !important;
+  min-height: var(--embed-h, 140px) !important;
+  max-height: var(--embed-h, 140px) !important;
+  overflow: hidden !important;
+  margin: 0;
+  padding: 0;
 }
 
 #app {
@@ -105,6 +115,7 @@ body.embed-mode .embed-page {
   border: 0;
   display: block;
   background: #fff;
+  overflow: hidden;
 }
 
 .controls-grid {
@@ -182,12 +193,15 @@ body.embed-mode .embed-page {
 .logos-section {
   width: 100%;
   height: var(--embed-h, 140px);
+  min-height: var(--embed-h, 140px);
+  max-height: var(--embed-h, 140px);
   overflow: hidden;
   background: var(--embed-bg, #ffffff);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
+  margin: 0;
 }
 
 .logos-viewport {
@@ -197,11 +211,15 @@ body.embed-mode .embed-page {
   position: relative;
   display: flex;
   align-items: center;
+  margin: 0;
+  padding: 0;
 }
 
 .logos-marquee {
   display: flex;
+  align-items: center;
   width: max-content;
+  height: 100%;
   will-change: transform;
   animation: marquee var(--duration, 30s) linear infinite;
 }

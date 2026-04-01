@@ -44,8 +44,18 @@ function waitImages(container) {
   );
 }
 
+function applyEmbedHeight(height) {
+  const h = `${height}px`;
+  document.documentElement.style.setProperty('--embed-h', h);
+  document.body.style.setProperty('--embed-h', h);
+  document.documentElement.classList.add('embed-mode');
+  document.body.classList.add('embed-mode');
+}
+
 async function buildMarquee(target, logos, config, grupo) {
   target.innerHTML = '';
+
+  applyEmbedHeight(config.h);
 
   const section = document.createElement('section');
   section.className = 'logos-section';
@@ -140,6 +150,7 @@ function buildIframeCode(url, h) {
 async function renderPanel(manifest) {
   const app = document.getElementById('app');
   app.className = '';
+  document.documentElement.classList.remove('embed-mode');
   document.body.className = '';
 
   const groups = Object.entries(manifest).filter(([, logos]) => Array.isArray(logos) && logos.length);
@@ -273,6 +284,7 @@ async function renderPanel(manifest) {
 
 async function renderEmbed(manifest, params) {
   const app = document.getElementById('app');
+  document.documentElement.classList.add('embed-mode');
   document.body.className = 'embed-mode';
   app.className = 'embed-page';
 

@@ -1,0 +1,45 @@
+name: Actualizar manifest de logos
+
+on:
+  push:
+    paths:
+      - 'logos/**'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Generar manifest.json
+        run: |
+          python <<'PY'
+          import os
+          import json
+
+          carpeta = "logos"
+          extensiones = (".png", ".jpg", ".jpeg", ".webp", ".svg")
+
+          archivos = []
+          if os.path.isdir(carpeta):
+              for nombre in sorted(os.listdir(carpeta)):
+                  ruta = os.path.join(carpeta, nombre)
+                  if os.path.isfile(ruta) and nombre.lower().endswith(extensiones):
+                      archivos.append(f"logos/{nombre}")
+
+          with open("manifest.json", "w", encoding="utf-8") as f:
+              json.dump(archivos, f, ensure_ascii=False, indent=2)
+          PY
+
+      - name: Subir cambios si hubo actualización
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add manifest.json
+          git diff --cached --quiet || git commit -m "Actualizar manifest.json automáticamente"
+          git push

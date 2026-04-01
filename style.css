@@ -12,34 +12,46 @@
   --white: #fff;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
+  width: 100%;
   font-family: Arial, sans-serif;
   color: var(--text);
   background: var(--bg);
 }
 
+body {
+  min-height: 100vh;
+}
+
 body.embed-mode,
 html.embed-mode {
-  margin: 0;
-  padding: 0;
-  background: transparent;
-  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
   height: var(--embed-h, 140px) !important;
   min-height: var(--embed-h, 140px) !important;
   max-height: var(--embed-h, 140px) !important;
+  overflow: hidden !important;
+  background: transparent !important;
+  line-height: 0 !important;
+  overscroll-behavior: none !important;
+  -webkit-overflow-scrolling: auto !important;
+  touch-action: pan-x !important;
 }
 
 body.embed-mode #app,
 body.embed-mode .embed-page {
-  width: 100%;
+  width: 100% !important;
   height: var(--embed-h, 140px) !important;
   min-height: var(--embed-h, 140px) !important;
   max-height: var(--embed-h, 140px) !important;
   overflow: hidden !important;
-  margin: 0;
-  padding: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 0 !important;
 }
 
 #app {
@@ -79,7 +91,7 @@ body.embed-mode .embed-page {
   border: 1px solid var(--border);
   border-radius: var(--card-radius);
   padding: 18px;
-  box-shadow: 0 4px 18px rgba(0,0,0,0.04);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
 }
 
 .carousel-card-head {
@@ -108,6 +120,7 @@ body.embed-mode .embed-page {
   background: #fff;
   overflow: hidden;
   margin-bottom: 14px;
+  line-height: 0;
 }
 
 .embed-frame {
@@ -116,6 +129,7 @@ body.embed-mode .embed-page {
   display: block;
   background: #fff;
   overflow: hidden;
+  line-height: 0;
 }
 
 .controls-grid {
@@ -188,6 +202,7 @@ body.embed-mode .embed-page {
   width: 100%;
   overflow: hidden;
   background: transparent;
+  line-height: 0;
 }
 
 .logos-section {
@@ -197,22 +212,24 @@ body.embed-mode .embed-page {
   max-height: var(--embed-h, 140px);
   overflow: hidden;
   background: var(--embed-bg, #ffffff);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
   padding: 0;
   margin: 0;
+  line-height: 0;
 }
 
 .logos-viewport {
   width: 100%;
   height: 100%;
+  min-height: 100%;
+  max-height: 100%;
   overflow: hidden;
   position: relative;
   display: flex;
   align-items: center;
   margin: 0;
   padding: 0;
+  line-height: 0;
 }
 
 .logos-marquee {
@@ -220,8 +237,11 @@ body.embed-mode .embed-page {
   align-items: center;
   width: max-content;
   height: 100%;
+  min-height: 100%;
+  max-height: 100%;
   will-change: transform;
   animation: marquee var(--duration, 30s) linear infinite;
+  line-height: 0;
 }
 
 .logos-group {
@@ -229,6 +249,9 @@ body.embed-mode .embed-page {
   align-items: center;
   flex-shrink: 0;
   height: 100%;
+  min-height: 100%;
+  max-height: 100%;
+  line-height: 0;
 }
 
 .logo-item {
@@ -238,7 +261,11 @@ body.embed-mode .embed-page {
   justify-content: center;
   width: var(--cell-width, 180px);
   height: 100%;
+  min-height: 100%;
+  max-height: 100%;
   padding: 0 var(--gap, 16px);
+  line-height: 0;
+  overflow: hidden;
 }
 
 .logo-item img {
@@ -248,6 +275,8 @@ body.embed-mode .embed-page {
   height: auto;
   object-fit: contain;
   display: block;
+  vertical-align: middle;
+  border: 0;
 }
 
 .empty-state {
@@ -271,8 +300,12 @@ body.embed-mode .embed-page {
 }
 
 @keyframes marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(calc(-1 * var(--group-width, 1000px))); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-1 * var(--group-width, 1000px)));
+  }
 }
 
 @media (max-width: 900px) {

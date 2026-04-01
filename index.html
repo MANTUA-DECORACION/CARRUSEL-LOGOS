@@ -4,10 +4,688 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Panel de carruseles Mantua</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --page-max: 1200px;
+      --card-radius: 18px;
+      --border: #e7e7e7;
+      --text: #202020;
+      --muted: #666;
+      --bg: #f7f7f7;
+      --white: #fff;
+      --embed-h: 72px;
+      --logo-max: 40px;
+      --gap: 14px;
+      --cell-width: 140px;
+      --group-width: 1000px;
+      --duration: 30s;
+      --embed-bg: #ffffff;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      font-family: Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    #app {
+      width: 100%;
+    }
+
+    /* PANEL */
+    .panel-page {
+      max-width: var(--page-max);
+      margin: 0 auto;
+      padding: 28px 18px 40px;
+    }
+
+    .panel-header {
+      margin-bottom: 22px;
+    }
+
+    .panel-title {
+      margin: 0 0 8px 0;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .panel-subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    .carousel-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--card-radius);
+      padding: 18px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+    }
+
+    .carousel-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .carousel-card-title {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .carousel-card-count {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .preview-shell {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fff;
+      overflow: hidden;
+      margin-bottom: 14px;
+      line-height: 0;
+    }
+
+    .embed-frame {
+      width: 100%;
+      border: 0;
+      display: block;
+      background: #fff;
+      overflow: hidden;
+      line-height: 0;
+    }
+
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .control-box label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+
+    .control-box input {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 10px;
+      font-size: 14px;
+      background: #fff;
+    }
+
+    .output-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin: 10px 0 6px;
+    }
+
+    .output-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .output-row textarea,
+    .output-row input {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 13px;
+      background: #fafafa;
+      resize: vertical;
+      min-height: 42px;
+    }
+
+    .copy-btn,
+    .open-btn {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      background: #202020;
+      color: #fff;
+      white-space: nowrap;
+    }
+
+    .actions-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .empty-state {
+      max-width: 900px;
+      margin: 50px auto;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+    }
+
+    .empty-state h2 {
+      margin-top: 0;
+    }
+
+    .code {
+      background: #f3f3f3;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-family: monospace;
+    }
+
+    /* EMBED ULTRA RÍGIDO */
+    html.embed-mode,
+    body.embed-mode {
+      width: 100% !important;
+      height: var(--embed-h) !important;
+      min-height: var(--embed-h) !important;
+      max-height: var(--embed-h) !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+      background: transparent !important;
+      line-height: 0 !important;
+      overscroll-behavior: none !important;
+      -webkit-overflow-scrolling: auto !important;
+      touch-action: pan-x !important;
+    }
+
+    body.embed-mode {
+      min-height: auto !important;
+      position: relative !important;
+    }
+
+    body.embed-mode #app {
+      width: 100% !important;
+      height: var(--embed-h) !important;
+      min-height: var(--embed-h) !important;
+      max-height: var(--embed-h) !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+      line-height: 0 !important;
+      position: relative !important;
+    }
+
+    .embed-page {
+      width: 100%;
+      height: var(--embed-h);
+      min-height: var(--embed-h);
+      max-height: var(--embed-h);
+      overflow: hidden;
+      background: transparent;
+      line-height: 0;
+      position: relative;
+    }
+
+    .embed-crop {
+      width: 100%;
+      height: var(--embed-h);
+      min-height: var(--embed-h);
+      max-height: var(--embed-h);
+      overflow: hidden;
+      position: relative;
+      line-height: 0;
+      background: var(--embed-bg);
+    }
+
+    .embed-inner {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: var(--embed-bg);
+    }
+
+    .logos-stage {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: var(--embed-bg);
+    }
+
+    .logos-track {
+      display: flex;
+      align-items: center;
+      width: max-content;
+      height: 100%;
+      animation: marquee var(--duration) linear infinite;
+      will-change: transform;
+    }
+
+    .logos-group {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      height: 100%;
+    }
+
+    .logo-item {
+      flex: 0 0 auto;
+      width: var(--cell-width);
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 var(--gap);
+      overflow: hidden;
+      line-height: 0;
+    }
+
+    .logo-item img {
+      display: block;
+      max-width: 100%;
+      max-height: var(--logo-max);
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border: 0;
+      vertical-align: middle;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    @keyframes marquee {
+      from {
+        transform: translateX(0);
+      }
+      to {
+        transform: translateX(calc(-1 * var(--group-width)));
+      }
+    }
+
+    @media (max-width: 900px) {
+      .controls-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 768px) {
+      .panel-title {
+        font-size: 22px;
+      }
+
+      .carousel-card {
+        padding: 14px;
+      }
+
+      .controls-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
   <main id="app"></main>
-  <script src="script.js"></script>
+
+  <script>
+    const BASE_URL = `${window.location.origin}${window.location.pathname}`;
+
+    function num(v, fallback) {
+      const n = Number(v);
+      return Number.isFinite(n) && n > 0 ? n : fallback;
+    }
+
+    function getParams() {
+      const p = new URLSearchParams(window.location.search);
+      return {
+        grupo: p.get('grupo'),
+        mode: p.get('mode') || 'panel',
+        h: num(p.get('h'), 72),
+        logo: num(p.get('logo'), 40),
+        gap: num(p.get('gap'), 14),
+        speed: num(p.get('speed'), 90),
+        bg: p.get('bg') || 'ffffff'
+      };
+    }
+
+    async function loadManifest() {
+      const r = await fetch('manifest.json');
+      return r.json();
+    }
+
+    function normalizeBg(bg) {
+      return bg.startsWith('#') ? bg : `#${bg}`;
+    }
+
+    function titleCase(text) {
+      return text.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    function waitImages(container) {
+      const images = Array.from(container.querySelectorAll('img'));
+      return Promise.all(
+        images.map(img => {
+          if (img.complete) return Promise.resolve();
+          return new Promise(resolve => {
+            img.onload = resolve;
+            img.onerror = resolve;
+          });
+        })
+      );
+    }
+
+    function setEmbedVars(config) {
+      const h = `${config.h}px`;
+      document.documentElement.style.setProperty('--embed-h', h);
+      document.body.style.setProperty('--embed-h', h);
+      document.documentElement.style.setProperty('--logo-max', `${config.logo}px`);
+      document.body.style.setProperty('--logo-max', `${config.logo}px`);
+      document.documentElement.style.setProperty('--gap', `${config.gap}px`);
+      document.body.style.setProperty('--gap', `${config.gap}px`);
+      document.documentElement.style.setProperty('--embed-bg', normalizeBg(config.bg));
+      document.body.style.setProperty('--embed-bg', normalizeBg(config.bg));
+      document.documentElement.classList.add('embed-mode');
+      document.body.classList.add('embed-mode');
+    }
+
+    function buildEmbedUrl(grupo, config) {
+      const q = new URLSearchParams({
+        mode: 'embed',
+        grupo,
+        h: String(config.h),
+        logo: String(config.logo),
+        gap: String(config.gap),
+        speed: String(config.speed),
+        bg: config.bg.replace('#', '')
+      });
+      return `${BASE_URL}?${q.toString()}`;
+    }
+
+    function buildIframeCode(url, h) {
+      return `<div style="width:100%;height:${h}px;max-height:${h}px;overflow:hidden;position:relative;margin:0;padding:0;line-height:0;">
+  <iframe
+    src="${url}"
+    width="100%"
+    height="${h}"
+    frameborder="0"
+    scrolling="no"
+    allowfullscreen
+    style="position:absolute;top:0;left:0;width:100%;height:${h}px;max-height:${h}px;border:0;margin:0;padding:0;overflow:hidden;display:block;line-height:0;background:transparent;">
+  </iframe>
+</div>`;
+    }
+
+    async function buildEmbed(target, logos, config, grupo) {
+      target.innerHTML = '';
+      setEmbedVars(config);
+
+      const crop = document.createElement('div');
+      crop.className = 'embed-crop';
+
+      const inner = document.createElement('div');
+      inner.className = 'embed-inner';
+
+      const stage = document.createElement('div');
+      stage.className = 'logos-stage';
+
+      const track = document.createElement('div');
+      track.className = 'logos-track';
+
+      const group = document.createElement('div');
+      group.className = 'logos-group';
+
+      const cellWidth = Math.max(110, Math.round(config.logo * 2.2));
+      document.documentElement.style.setProperty('--cell-width', `${cellWidth}px`);
+      document.body.style.setProperty('--cell-width', `${cellWidth}px`);
+
+      const addSet = (container) => {
+        logos.forEach(ruta => {
+          const item = document.createElement('div');
+          item.className = 'logo-item';
+
+          const img = document.createElement('img');
+          img.src = ruta;
+          img.alt = `Logo ${grupo}`;
+          img.loading = 'eager';
+          img.decoding = 'async';
+
+          item.appendChild(img);
+          container.appendChild(item);
+        });
+      };
+
+      addSet(group);
+      track.appendChild(group);
+      stage.appendChild(track);
+      inner.appendChild(stage);
+      crop.appendChild(inner);
+      target.appendChild(crop);
+
+      await waitImages(group);
+
+      let width = group.offsetWidth;
+      const viewportWidth = Math.max(window.innerWidth, target.clientWidth || 0);
+
+      while (width < viewportWidth * 1.5) {
+        addSet(group);
+        await waitImages(group);
+        width = group.offsetWidth;
+      }
+
+      const clone = group.cloneNode(true);
+      track.appendChild(clone);
+
+      const groupWidth = group.offsetWidth;
+      document.documentElement.style.setProperty('--group-width', `${groupWidth}px`);
+      document.body.style.setProperty('--group-width', `${groupWidth}px`);
+      document.documentElement.style.setProperty('--duration', `${groupWidth / config.speed}s`);
+      document.body.style.setProperty('--duration', `${groupWidth / config.speed}s`);
+    }
+
+    async function renderPanel(manifest) {
+      const app = document.getElementById('app');
+      document.documentElement.classList.remove('embed-mode');
+      document.body.classList.remove('embed-mode');
+
+      const groups = Object.entries(manifest).filter(([, logos]) => Array.isArray(logos) && logos.length);
+
+      if (!groups.length) {
+        app.innerHTML = `
+          <section class="empty-state">
+            <h2>No hay carruseles disponibles</h2>
+            <p>Sube logos dentro de <span class="code">logos/TU_GRUPO/</span> y el sistema los detectará.</p>
+          </section>
+        `;
+        return;
+      }
+
+      app.innerHTML = `
+        <div class="panel-page">
+          <div class="panel-header">
+            <h1 class="panel-title">Panel de carruseles Mantua</h1>
+            <p class="panel-subtitle">Cada grupo genera su preview, link e iframe listo para incrustar.</p>
+          </div>
+          <div class="cards-grid" id="cardsGrid"></div>
+        </div>
+      `;
+
+      const grid = document.getElementById('cardsGrid');
+
+      for (const [grupo, logos] of groups) {
+        const defaults = { h: 72, logo: 40, gap: 14, speed: 90, bg: 'ffffff' };
+
+        const card = document.createElement('article');
+        card.className = 'carousel-card';
+        card.innerHTML = `
+          <div class="carousel-card-head">
+            <h2 class="carousel-card-title">${titleCase(grupo)}</h2>
+            <div class="carousel-card-count">${logos.length} logo(s)</div>
+          </div>
+
+          <div class="preview-shell">
+            <iframe class="embed-frame" title="Preview ${grupo}" scrolling="no"></iframe>
+          </div>
+
+          <div class="controls-grid">
+            <div class="control-box">
+              <label>Alto carrusel</label>
+              <input type="number" min="50" value="${defaults.h}" data-role="h">
+            </div>
+            <div class="control-box">
+              <label>Logo máximo</label>
+              <input type="number" min="20" value="${defaults.logo}" data-role="logo">
+            </div>
+            <div class="control-box">
+              <label>Separación</label>
+              <input type="number" min="4" value="${defaults.gap}" data-role="gap">
+            </div>
+            <div class="control-box">
+              <label>Velocidad</label>
+              <input type="number" min="20" value="${defaults.speed}" data-role="speed">
+            </div>
+          </div>
+
+          <div class="output-label">Link</div>
+          <div class="output-row">
+            <input type="text" readonly data-role="link">
+            <button class="copy-btn" data-copy="link">Copiar</button>
+          </div>
+
+          <div class="output-label">Iframe</div>
+          <div class="output-row">
+            <textarea readonly rows="4" data-role="iframe"></textarea>
+            <button class="copy-btn" data-copy="iframe">Copiar</button>
+          </div>
+
+          <div class="actions-row">
+            <button class="open-btn" data-open="preview">Abrir</button>
+          </div>
+        `;
+
+        grid.appendChild(card);
+
+        const preview = card.querySelector('.embed-frame');
+        const inputH = card.querySelector('[data-role="h"]');
+        const inputLogo = card.querySelector('[data-role="logo"]');
+        const inputGap = card.querySelector('[data-role="gap"]');
+        const inputSpeed = card.querySelector('[data-role="speed"]');
+        const linkField = card.querySelector('[data-role="link"]');
+        const iframeField = card.querySelector('[data-role="iframe"]');
+        const copyButtons = card.querySelectorAll('.copy-btn');
+        const openBtn = card.querySelector('[data-open="preview"]');
+
+        const refresh = () => {
+          const config = {
+            h: num(inputH.value, defaults.h),
+            logo: num(inputLogo.value, defaults.logo),
+            gap: num(inputGap.value, defaults.gap),
+            speed: num(inputSpeed.value, defaults.speed),
+            bg: defaults.bg
+          };
+
+          const url = buildEmbedUrl(grupo, config);
+          const iframe = buildIframeCode(url, config.h);
+
+          preview.src = url;
+          preview.height = config.h;
+          preview.style.height = `${config.h}px`;
+          preview.style.maxHeight = `${config.h}px`;
+          preview.style.display = 'block';
+          preview.style.overflow = 'hidden';
+
+          linkField.value = url;
+          iframeField.value = iframe;
+          openBtn.onclick = () => window.open(url, '_blank');
+        };
+
+        [inputH, inputLogo, inputGap, inputSpeed].forEach(el => {
+          el.addEventListener('input', refresh);
+        });
+
+        copyButtons.forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const type = btn.dataset.copy;
+            const text = type === 'link' ? linkField.value : iframeField.value;
+
+            try {
+              await navigator.clipboard.writeText(text);
+              btn.textContent = 'Copiado';
+              setTimeout(() => {
+                btn.textContent = 'Copiar';
+              }, 1000);
+            } catch {
+              btn.textContent = 'Error';
+              setTimeout(() => {
+                btn.textContent = 'Copiar';
+              }, 1000);
+            }
+          });
+        });
+
+        refresh();
+      }
+    }
+
+    async function renderEmbed(manifest, params) {
+      const app = document.getElementById('app');
+      app.className = 'embed-page';
+
+      if (!params.grupo || !manifest[params.grupo] || !manifest[params.grupo].length) {
+        app.innerHTML = '';
+        return;
+      }
+
+      await buildEmbed(app, manifest[params.grupo], params, params.grupo);
+    }
+
+    async function init() {
+      try {
+        const manifest = await loadManifest();
+        const params = getParams();
+
+        if (params.mode === 'embed' && params.grupo) {
+          await renderEmbed(manifest, params);
+        } else {
+          await renderPanel(manifest);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    window.addEventListener('load', init);
+
+    window.addEventListener('resize', () => {
+      const params = getParams();
+
+      if (params.mode === 'embed' && params.grupo) {
+        clearTimeout(window.__mantuaResize);
+        window.__mantuaResize = setTimeout(init, 220);
+      }
+    });
+  </script>
 </body>
 </html>

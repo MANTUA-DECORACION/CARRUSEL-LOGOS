@@ -2,31 +2,42 @@
   box-sizing: border-box;
 }
 
-body {
+html, body {
   margin: 0;
+  padding: 0;
   background: transparent;
   font-family: Arial, sans-serif;
+  overflow: hidden;
+}
+
+body {
+  width: 100%;
 }
 
 .logos-section {
   width: 100%;
-  overflow: hidden;
   background: #ffffff;
-  padding: 18px 0;
+  padding: 14px 0;
+  overflow: hidden;
 }
 
-.logos-track {
+.logos-viewport {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.logos-marquee {
   display: flex;
-  align-items: center;
   width: max-content;
-  animation: scroll 35s linear infinite;
+  will-change: transform;
+  animation: marquee var(--duration, 30s) linear infinite;
 }
 
 .logos-group {
   display: flex;
   align-items: center;
-  gap: 56px;
-  padding-right: 56px;
+  flex-shrink: 0;
 }
 
 .logo-item {
@@ -34,28 +45,33 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0 28px;
 }
 
 .logo-item img {
-  height: 54px;
+  height: 56px;
   width: auto;
+  max-width: none;
   object-fit: contain;
   display: block;
 }
 
-@keyframes scroll {
+@keyframes marquee {
   from {
     transform: translateX(0);
   }
   to {
-    transform: translateX(-50%);
+    transform: translateX(calc(-1 * var(--group-width, 1000px)));
   }
 }
 
 @media (max-width: 768px) {
-  .logos-group {
-    gap: 32px;
-    padding-right: 32px;
+  .logos-section {
+    padding: 10px 0;
+  }
+
+  .logo-item {
+    padding: 0 18px;
   }
 
   .logo-item img {

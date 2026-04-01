@@ -4,6 +4,8 @@ async function cargarLogos() {
     const logos = await respuesta.json();
 
     const marquee = document.getElementById('logosMarquee');
+    if (!marquee) return;
+
     marquee.innerHTML = '';
 
     if (!Array.isArray(logos) || logos.length === 0) return;
@@ -59,7 +61,7 @@ async function cargarLogos() {
 
     marquee.style.setProperty('--group-width', `${grupoBase.offsetWidth}px`);
 
-    const velocidad = 90; // pixeles por segundo
+    const velocidad = 90;
     const duracion = grupoBase.offsetWidth / velocidad;
     marquee.style.setProperty('--duration', `${duracion}s`);
   } catch (error) {

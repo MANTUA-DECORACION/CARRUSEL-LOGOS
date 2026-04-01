@@ -49,7 +49,7 @@ body {
 }
 
 .logo-item img {
-  height: 500px;
+  height: 100px;
   width: auto;
   max-width: none;
   object-fit: contain;
@@ -75,6 +75,6 @@ body {
   }
 
   .logo-item img {
-    height: 500px;
+    height: 100px;
   }
 }

@@ -17,13 +17,12 @@
       --muted: #666;
       --bg: #f7f7f7;
       --white: #fff;
-      --embed-h: 72px;
-      --logo-max: 40px;
-      --gap: 14px;
-      --cell-width: 140px;
-      --group-width: 1000px;
-      --duration: 30s;
       --embed-bg: #ffffff;
+      --logo-max: 80px;
+      --gap: 18px;
+      --cell-width: 220px;
+      --group-width: 1200px;
+      --duration: 30s;
     }
 
     html,
@@ -44,7 +43,6 @@
       width: 100%;
     }
 
-    /* PANEL */
     .panel-page {
       max-width: var(--page-max);
       margin: 0 auto;
@@ -205,74 +203,46 @@
       font-family: monospace;
     }
 
-    /* EMBED ULTRA RÍGIDO */
+    /* EMBED QUE LLENA TODA LA ALTURA DISPONIBLE */
     html.embed-mode,
     body.embed-mode {
-      width: 100% !important;
-      height: var(--embed-h) !important;
-      min-height: var(--embed-h) !important;
-      max-height: var(--embed-h) !important;
       margin: 0 !important;
       padding: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 100vh !important;
       overflow: hidden !important;
-      background: transparent !important;
-      line-height: 0 !important;
-      overscroll-behavior: none !important;
-      -webkit-overflow-scrolling: auto !important;
-      touch-action: pan-x !important;
+      background: var(--embed-bg) !important;
     }
 
     body.embed-mode {
-      min-height: auto !important;
-      position: relative !important;
+      min-height: 100dvh !important;
     }
 
     body.embed-mode #app {
       width: 100% !important;
-      height: var(--embed-h) !important;
-      min-height: var(--embed-h) !important;
-      max-height: var(--embed-h) !important;
-      margin: 0 !important;
-      padding: 0 !important;
+      height: 100dvh !important;
+      min-height: 100dvh !important;
       overflow: hidden !important;
-      line-height: 0 !important;
-      position: relative !important;
+      background: var(--embed-bg) !important;
     }
 
     .embed-page {
       width: 100%;
-      height: var(--embed-h);
-      min-height: var(--embed-h);
-      max-height: var(--embed-h);
+      height: 100dvh;
+      min-height: 100dvh;
       overflow: hidden;
-      background: transparent;
-      line-height: 0;
-      position: relative;
-    }
-
-    .embed-crop {
-      width: 100%;
-      height: var(--embed-h);
-      min-height: var(--embed-h);
-      max-height: var(--embed-h);
-      overflow: hidden;
-      position: relative;
-      line-height: 0;
       background: var(--embed-bg);
+      position: relative;
     }
 
-    .embed-inner {
+    .embed-stage {
       position: absolute;
       inset: 0;
       overflow: hidden;
       background: var(--embed-bg);
-    }
-
-    .logos-stage {
-      position: absolute;
-      inset: 0;
-      overflow: hidden;
-      background: var(--embed-bg);
+      display: flex;
+      align-items: center;
     }
 
     .logos-track {
@@ -300,7 +270,6 @@
       justify-content: center;
       padding: 0 var(--gap);
       overflow: hidden;
-      line-height: 0;
     }
 
     .logo-item img {
@@ -311,7 +280,6 @@
       height: auto;
       object-fit: contain;
       border: 0;
-      vertical-align: middle;
       pointer-events: none;
       user-select: none;
       -webkit-user-drag: none;
@@ -363,9 +331,9 @@
       return {
         grupo: p.get('grupo'),
         mode: p.get('mode') || 'panel',
-        h: num(p.get('h'), 72),
-        logo: num(p.get('logo'), 40),
-        gap: num(p.get('gap'), 14),
+        h: num(p.get('h'), 180),
+        logo: num(p.get('logo'), 80),
+        gap: num(p.get('gap'), 18),
         speed: num(p.get('speed'), 90),
         bg: p.get('bg') || 'ffffff'
       };
@@ -397,16 +365,23 @@
       );
     }
 
-    function setEmbedVars(config) {
-      const h = `${config.h}px`;
-      document.documentElement.style.setProperty('--embed-h', h);
-      document.body.style.setProperty('--embed-h', h);
-      document.documentElement.style.setProperty('--logo-max', `${config.logo}px`);
-      document.body.style.setProperty('--logo-max', `${config.logo}px`);
-      document.documentElement.style.setProperty('--gap', `${config.gap}px`);
-      document.body.style.setProperty('--gap', `${config.gap}px`);
-      document.documentElement.style.setProperty('--embed-bg', normalizeBg(config.bg));
-      document.body.style.setProperty('--embed-bg', normalizeBg(config.bg));
+    function setEmbedVars(config, realHeight) {
+      const bg = normalizeBg(config.bg);
+      const h = Math.max(140, realHeight || window.innerHeight || 300);
+
+      const logoMax = Math.max(48, Math.round(h * 0.45));
+      const gap = Math.max(10, Math.round(h * 0.06));
+      const cellWidth = Math.max(120, Math.round(logoMax * 2.3));
+
+      document.documentElement.style.setProperty('--embed-bg', bg);
+      document.body.style.setProperty('--embed-bg', bg);
+      document.documentElement.style.setProperty('--logo-max', `${logoMax}px`);
+      document.body.style.setProperty('--logo-max', `${logoMax}px`);
+      document.documentElement.style.setProperty('--gap', `${gap}px`);
+      document.body.style.setProperty('--gap', `${gap}px`);
+      document.documentElement.style.setProperty('--cell-width', `${cellWidth}px`);
+      document.body.style.setProperty('--cell-width', `${cellWidth}px`);
+
       document.documentElement.classList.add('embed-mode');
       document.body.classList.add('embed-mode');
     }
@@ -425,41 +400,29 @@
     }
 
     function buildIframeCode(url, h) {
-      return `<div style="width:100%;height:${h}px;max-height:${h}px;overflow:hidden;position:relative;margin:0;padding:0;line-height:0;">
-  <iframe
-    src="${url}"
-    width="100%"
-    height="${h}"
-    frameborder="0"
-    scrolling="no"
-    allowfullscreen
-    style="position:absolute;top:0;left:0;width:100%;height:${h}px;max-height:${h}px;border:0;margin:0;padding:0;overflow:hidden;display:block;line-height:0;background:transparent;">
-  </iframe>
-</div>`;
+      return `<iframe
+  src="${url}"
+  width="100%"
+  height="${h}"
+  frameborder="0"
+  scrolling="no"
+  style="display:block;width:100%;height:${h}px;border:0;margin:0;padding:0;overflow:hidden;background:#ffffff;">
+</iframe>`;
     }
 
     async function buildEmbed(target, logos, config, grupo) {
       target.innerHTML = '';
-      setEmbedVars(config);
-
-      const crop = document.createElement('div');
-      crop.className = 'embed-crop';
-
-      const inner = document.createElement('div');
-      inner.className = 'embed-inner';
+      const realHeight = target.clientHeight || window.innerHeight || 300;
+      setEmbedVars(config, realHeight);
 
       const stage = document.createElement('div');
-      stage.className = 'logos-stage';
+      stage.className = 'embed-stage';
 
       const track = document.createElement('div');
       track.className = 'logos-track';
 
       const group = document.createElement('div');
       group.className = 'logos-group';
-
-      const cellWidth = Math.max(110, Math.round(config.logo * 2.2));
-      document.documentElement.style.setProperty('--cell-width', `${cellWidth}px`);
-      document.body.style.setProperty('--cell-width', `${cellWidth}px`);
 
       const addSet = (container) => {
         logos.forEach(ruta => {
@@ -480,9 +443,7 @@
       addSet(group);
       track.appendChild(group);
       stage.appendChild(track);
-      inner.appendChild(stage);
-      crop.appendChild(inner);
-      target.appendChild(crop);
+      target.appendChild(stage);
 
       await waitImages(group);
 
@@ -535,7 +496,7 @@
       const grid = document.getElementById('cardsGrid');
 
       for (const [grupo, logos] of groups) {
-        const defaults = { h: 72, logo: 40, gap: 14, speed: 90, bg: 'ffffff' };
+        const defaults = { h: 220, logo: 80, gap: 18, speed: 90, bg: 'ffffff' };
 
         const card = document.createElement('article');
         card.className = 'carousel-card';
@@ -551,16 +512,16 @@
 
           <div class="controls-grid">
             <div class="control-box">
-              <label>Alto carrusel</label>
-              <input type="number" min="50" value="${defaults.h}" data-role="h">
+              <label>Alto visual</label>
+              <input type="number" min="120" value="${defaults.h}" data-role="h">
             </div>
             <div class="control-box">
-              <label>Logo máximo</label>
-              <input type="number" min="20" value="${defaults.logo}" data-role="logo">
+              <label>Tamaño base logo</label>
+              <input type="number" min="40" value="${defaults.logo}" data-role="logo">
             </div>
             <div class="control-box">
-              <label>Separación</label>
-              <input type="number" min="4" value="${defaults.gap}" data-role="gap">
+              <label>Separación base</label>
+              <input type="number" min="8" value="${defaults.gap}" data-role="gap">
             </div>
             <div class="control-box">
               <label>Velocidad</label>
@@ -612,7 +573,6 @@
           preview.src = url;
           preview.height = config.h;
           preview.style.height = `${config.h}px`;
-          preview.style.maxHeight = `${config.h}px`;
           preview.style.display = 'block';
           preview.style.overflow = 'hidden';
 
@@ -659,6 +619,19 @@
       }
 
       await buildEmbed(app, manifest[params.grupo], params, params.grupo);
+
+      if (window.__mantuaObserver) {
+        window.__mantuaObserver.disconnect();
+      }
+
+      window.__mantuaObserver = new ResizeObserver(async () => {
+        clearTimeout(window.__mantuaEmbedResize);
+        window.__mantuaEmbedResize = setTimeout(async () => {
+          await buildEmbed(app, manifest[params.grupo], params, params.grupo);
+        }, 120);
+      });
+
+      window.__mantuaObserver.observe(app);
     }
 
     async function init() {
@@ -680,10 +653,9 @@
 
     window.addEventListener('resize', () => {
       const params = getParams();
-
       if (params.mode === 'embed' && params.grupo) {
         clearTimeout(window.__mantuaResize);
-        window.__mantuaResize = setTimeout(init, 220);
+        window.__mantuaResize = setTimeout(init, 180);
       }
     });
   </script>

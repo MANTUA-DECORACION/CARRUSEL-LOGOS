@@ -20,8 +20,7 @@
       --embed-bg: #ffffff;
       --group-width: 1000px;
       --duration: 30s;
-      --gap: 24px;
-      --cell-width: 240px;
+      --gap: 6px;
       --logo-max: 120px;
     }
 
@@ -291,7 +290,6 @@
 
     .logo-item {
       flex: 0 0 auto;
-      width: var(--cell-width);
       height: 100%;
       display: flex;
       align-items: center;
@@ -361,7 +359,7 @@
         mode: p.get('mode') || 'panel',
         h: num(p.get('h'), 600),
         logo: num(p.get('logo'), 120),
-        gap: num(p.get('gap'), 24),
+        gap: num(p.get('gap'), 6),
         speed: num(p.get('speed'), 90),
         bg: p.get('bg') || 'ffffff'
       };
@@ -406,8 +404,7 @@
       const h = Math.max(240, rootHeight || getRealViewportHeight());
 
       const logoMax = Math.max(90, Math.round(h * 0.42));
-      const gap = Math.max(4, Math.round(h * 0.015));
-      const cellWidth = Math.max(110, Math.round(logoMax * 1.45));
+      const gap = Math.max(2, Number(config.gap) || 6);
 
       document.documentElement.style.setProperty('--embed-bg', bg);
       document.body.style.setProperty('--embed-bg', bg);
@@ -415,8 +412,6 @@
       document.body.style.setProperty('--logo-max', `${logoMax}px`);
       document.documentElement.style.setProperty('--gap', `${gap}px`);
       document.body.style.setProperty('--gap', `${gap}px`);
-      document.documentElement.style.setProperty('--cell-width', `${cellWidth}px`);
-      document.body.style.setProperty('--cell-width', `${cellWidth}px`);
 
       document.documentElement.classList.add('embed-mode');
       document.body.classList.add('embed-mode');
@@ -538,7 +533,7 @@
       const grid = document.getElementById('cardsGrid');
 
       for (const [grupo, logos] of groups) {
-        const defaults = { h: 600, logo: 120, gap: 24, speed: 90, bg: 'ffffff' };
+        const defaults = { h: 600, logo: 120, gap: 6, speed: 90, bg: 'ffffff' };
 
         const card = document.createElement('article');
         card.className = 'carousel-card';
@@ -563,7 +558,7 @@
             </div>
             <div class="control-box">
               <label>Separación base</label>
-              <input type="number" min="10" value="${defaults.gap}" data-role="gap">
+              <input type="number" min="2" value="${defaults.gap}" data-role="gap">
             </div>
             <div class="control-box">
               <label>Velocidad</label>

@@ -17,7 +17,6 @@
       --muted: #666;
       --bg: #f7f7f7;
       --white: #fff;
-
       --embed-bg: #ffffff;
       --group-width: 1000px;
       --duration: 30s;
@@ -44,7 +43,6 @@
       width: 100%;
     }
 
-    /* PANEL */
     .panel-page {
       max-width: var(--page-max);
       margin: 0 auto;
@@ -205,7 +203,6 @@
       font-family: monospace;
     }
 
-    /* EMBED FULL SCREEN / FULL BLOCK */
     html.embed-mode,
     body.embed-mode {
       margin: 0 !important;
@@ -362,7 +359,7 @@
       return {
         grupo: p.get('grupo'),
         mode: p.get('mode') || 'panel',
-        h: num(p.get('h'), 420),
+        h: num(p.get('h'), 600),
         logo: num(p.get('logo'), 120),
         gap: num(p.get('gap'), 24),
         speed: num(p.get('speed'), 90),
@@ -372,6 +369,7 @@
 
     async function loadManifest() {
       const r = await fetch('manifest.json');
+      if (!r.ok) throw new Error('No se pudo cargar manifest.json');
       return r.json();
     }
 
@@ -380,7 +378,10 @@
     }
 
     function titleCase(text) {
-      return text.toLowerCase().replace(/_/g, ' ').replace(/\\b\\w/g, c => c.toUpperCase());
+      return String(text)
+        .toLowerCase()
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, c => c.toUpperCase());
     }
 
     function waitImages(container) {
@@ -465,7 +466,7 @@
       const group = document.createElement('div');
       group.className = 'logos-group';
 
-      const addSet = (container) => {
+      function addSet(container) {
         logos.forEach(ruta => {
           const item = document.createElement('div');
           item.className = 'logo-item';
@@ -479,7 +480,7 @@
           item.appendChild(img);
           container.appendChild(item);
         });
-      };
+      }
 
       addSet(group);
       track.appendChild(group);
@@ -515,16 +516,16 @@
       const groups = Object.entries(manifest).filter(([, logos]) => Array.isArray(logos) && logos.length);
 
       if (!groups.length) {
-        app.innerHTML = \`
+        app.innerHTML = `
           <section class="empty-state">
             <h2>No hay carruseles disponibles</h2>
             <p>Sube logos dentro de <span class="code">logos/TU_GRUPO/</span> y el sistema los detectará.</p>
           </section>
-        \`;
+        `;
         return;
       }
 
-      app.innerHTML = \`
+      app.innerHTML = `
         <div class="panel-page">
           <div class="panel-header">
             <h1 class="panel-title">Panel de carruseles Mantua</h1>
@@ -532,7 +533,7 @@
           </div>
           <div class="cards-grid" id="cardsGrid"></div>
         </div>
-      \`;
+      `;
 
       const grid = document.getElementById('cardsGrid');
 
@@ -541,32 +542,32 @@
 
         const card = document.createElement('article');
         card.className = 'carousel-card';
-        card.innerHTML = \`
+        card.innerHTML = `
           <div class="carousel-card-head">
-            <h2 class="carousel-card-title">\${titleCase(grupo)}</h2>
-            <div class="carousel-card-count">\${logos.length} logo(s)</div>
+            <h2 class="carousel-card-title">${titleCase(grupo)}</h2>
+            <div class="carousel-card-count">${logos.length} logo(s)</div>
           </div>
 
           <div class="preview-shell">
-            <iframe class="embed-frame" title="Preview \${grupo}" scrolling="no"></iframe>
+            <iframe class="embed-frame" title="Preview ${grupo}" scrolling="no"></iframe>
           </div>
 
           <div class="controls-grid">
             <div class="control-box">
               <label>Alto visual</label>
-              <input type="number" min="300" value="\${defaults.h}" data-role="h">
+              <input type="number" min="300" value="${defaults.h}" data-role="h">
             </div>
             <div class="control-box">
               <label>Tamaño base logo</label>
-              <input type="number" min="60" value="\${defaults.logo}" data-role="logo">
+              <input type="number" min="60" value="${defaults.logo}" data-role="logo">
             </div>
             <div class="control-box">
               <label>Separación base</label>
-              <input type="number" min="10" value="\${defaults.gap}" data-role="gap">
+              <input type="number" min="10" value="${defaults.gap}" data-role="gap">
             </div>
             <div class="control-box">
               <label>Velocidad</label>
-              <input type="number" min="20" value="\${defaults.speed}" data-role="speed">
+              <input type="number" min="20" value="${defaults.speed}" data-role="speed">
             </div>
           </div>
 
@@ -585,7 +586,7 @@
           <div class="actions-row">
             <button class="open-btn" data-open="preview">Abrir</button>
           </div>
-        \`;
+        `;
 
         grid.appendChild(card);
 
@@ -599,7 +600,7 @@
         const copyButtons = card.querySelectorAll('.copy-btn');
         const openBtn = card.querySelector('[data-open="preview"]');
 
-        const refresh = () => {
+        function refresh() {
           const config = {
             h: num(inputH.value, defaults.h),
             logo: num(inputLogo.value, defaults.logo),
@@ -613,14 +614,14 @@
 
           preview.src = url;
           preview.height = config.h;
-          preview.style.height = \`\${config.h}px\`;
+          preview.style.height = `${config.h}px`;
           preview.style.display = 'block';
           preview.style.overflow = 'hidden';
 
           linkField.value = url;
           iframeField.value = iframe;
           openBtn.onclick = () => window.open(url, '_blank');
-        };
+        }
 
         [inputH, inputLogo, inputGap, inputSpeed].forEach(el => {
           el.addEventListener('input', refresh);
@@ -687,6 +688,13 @@
         }
       } catch (error) {
         console.error(error);
+        const app = document.getElementById('app');
+        app.innerHTML = `
+          <section class="empty-state">
+            <h2>Error al cargar</h2>
+            <p>Revisa que <span class="code">manifest.json</span> exista y tenga grupos con logos.</p>
+          </section>
+        `;
       }
     }
 

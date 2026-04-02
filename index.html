@@ -406,8 +406,8 @@
       const h = Math.max(240, rootHeight || getRealViewportHeight());
 
       const logoMax = Math.max(90, Math.round(h * 0.42));
-      const gap = Math.max(14, Math.round(h * 0.05));
-      const cellWidth = Math.max(180, Math.round(logoMax * 2.25));
+      const gap = Math.max(4, Math.round(h * 0.015));
+      const cellWidth = Math.max(110, Math.round(logoMax * 1.45));
 
       document.documentElement.style.setProperty('--embed-bg', bg);
       document.body.style.setProperty('--embed-bg', bg);

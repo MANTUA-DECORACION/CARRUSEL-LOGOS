@@ -17,12 +17,13 @@
       --muted: #666;
       --bg: #f7f7f7;
       --white: #fff;
+
       --embed-bg: #ffffff;
-      --logo-max: 80px;
-      --gap: 18px;
-      --cell-width: 220px;
-      --group-width: 1200px;
+      --group-width: 1000px;
       --duration: 30s;
+      --gap: 24px;
+      --cell-width: 240px;
+      --logo-max: 120px;
     }
 
     html,
@@ -43,6 +44,7 @@
       width: 100%;
     }
 
+    /* PANEL */
     .panel-page {
       max-width: var(--page-max);
       margin: 0 auto;
@@ -203,37 +205,65 @@
       font-family: monospace;
     }
 
-    /* EMBED QUE LLENA TODA LA ALTURA DISPONIBLE */
+    /* EMBED FULL SCREEN / FULL BLOCK */
     html.embed-mode,
     body.embed-mode {
       margin: 0 !important;
       padding: 0 !important;
       width: 100% !important;
-      height: 100% !important;
+      height: 100vh !important;
       min-height: 100vh !important;
+      max-height: 100vh !important;
       overflow: hidden !important;
       background: var(--embed-bg) !important;
     }
 
+    @supports (height: 100dvh) {
+      html.embed-mode,
+      body.embed-mode {
+        height: 100dvh !important;
+        min-height: 100dvh !important;
+        max-height: 100dvh !important;
+      }
+    }
+
     body.embed-mode {
-      min-height: 100dvh !important;
+      min-height: auto !important;
     }
 
     body.embed-mode #app {
       width: 100% !important;
-      height: 100dvh !important;
-      min-height: 100dvh !important;
+      height: 100vh !important;
+      min-height: 100vh !important;
+      max-height: 100vh !important;
       overflow: hidden !important;
       background: var(--embed-bg) !important;
     }
 
+    @supports (height: 100dvh) {
+      body.embed-mode #app {
+        height: 100dvh !important;
+        min-height: 100dvh !important;
+        max-height: 100dvh !important;
+      }
+    }
+
     .embed-page {
       width: 100%;
-      height: 100dvh;
-      min-height: 100dvh;
+      height: 100vh;
+      min-height: 100vh;
+      max-height: 100vh;
       overflow: hidden;
       background: var(--embed-bg);
       position: relative;
+    }
+
+    @supports (height: 100dvh) {
+      .embed-page {
+        height: 100dvh;
+        min-height: 100dvh;
+        max-height: 100dvh;
+      }
     }
 
     .embed-stage {
@@ -243,6 +273,7 @@
       background: var(--embed-bg);
       display: flex;
       align-items: center;
+      justify-content: flex-start;
     }
 
     .logos-track {
@@ -331,9 +362,9 @@
       return {
         grupo: p.get('grupo'),
         mode: p.get('mode') || 'panel',
-        h: num(p.get('h'), 180),
-        logo: num(p.get('logo'), 80),
-        gap: num(p.get('gap'), 18),
+        h: num(p.get('h'), 420),
+        logo: num(p.get('logo'), 120),
+        gap: num(p.get('gap'), 24),
         speed: num(p.get('speed'), 90),
         bg: p.get('bg') || 'ffffff'
       };
@@ -349,7 +380,7 @@
     }
 
     function titleCase(text) {
-      return text.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      return text.toLowerCase().replace(/_/g, ' ').replace(/\\b\\w/g, c => c.toUpperCase());
     }
 
     function waitImages(container) {
@@ -365,13 +396,17 @@
       );
     }
 
-    function setEmbedVars(config, realHeight) {
-      const bg = normalizeBg(config.bg);
-      const h = Math.max(140, realHeight || window.innerHeight || 300);
+    function getRealViewportHeight() {
+      return window.visualViewport?.height || window.innerHeight || document.documentElement.clientHeight || 600;
+    }
 
-      const logoMax = Math.max(48, Math.round(h * 0.45));
-      const gap = Math.max(10, Math.round(h * 0.06));
-      const cellWidth = Math.max(120, Math.round(logoMax * 2.3));
+    function setEmbedVars(config, rootHeight) {
+      const bg = normalizeBg(config.bg);
+      const h = Math.max(240, rootHeight || getRealViewportHeight());
+
+      const logoMax = Math.max(90, Math.round(h * 0.42));
+      const gap = Math.max(14, Math.round(h * 0.05));
+      const cellWidth = Math.max(180, Math.round(logoMax * 2.25));
 
       document.documentElement.style.setProperty('--embed-bg', bg);
       document.body.style.setProperty('--embed-bg', bg);
@@ -399,20 +434,26 @@
       return `${BASE_URL}?${q.toString()}`;
     }
 
-    function buildIframeCode(url, h) {
+    function buildIframeCode(url) {
       return `<iframe
   src="${url}"
   width="100%"
-  height="${h}"
+  height="600"
   frameborder="0"
   scrolling="no"
-  style="display:block;width:100%;height:${h}px;border:0;margin:0;padding:0;overflow:hidden;background:#ffffff;">
+  style="display:block;width:100%;height:100vh;min-height:600px;border:0;margin:0;padding:0;overflow:hidden;background:#ffffff;">
 </iframe>`;
     }
 
     async function buildEmbed(target, logos, config, grupo) {
       target.innerHTML = '';
-      const realHeight = target.clientHeight || window.innerHeight || 300;
+
+      const realHeight = Math.max(
+        target.clientHeight || 0,
+        getRealViewportHeight(),
+        600
+      );
+
       setEmbedVars(config, realHeight);
 
       const stage = document.createElement('div');
@@ -448,7 +489,7 @@
       await waitImages(group);
 
       let width = group.offsetWidth;
-      const viewportWidth = Math.max(window.innerWidth, target.clientWidth || 0);
+      const viewportWidth = Math.max(window.innerWidth, target.clientWidth || 0, 1200);
 
       while (width < viewportWidth * 1.5) {
         addSet(group);
@@ -474,16 +515,16 @@
       const groups = Object.entries(manifest).filter(([, logos]) => Array.isArray(logos) && logos.length);
 
       if (!groups.length) {
-        app.innerHTML = `
+        app.innerHTML = \`
           <section class="empty-state">
             <h2>No hay carruseles disponibles</h2>
             <p>Sube logos dentro de <span class="code">logos/TU_GRUPO/</span> y el sistema los detectará.</p>
           </section>
-        `;
+        \`;
         return;
       }
 
-      app.innerHTML = `
+      app.innerHTML = \`
         <div class="panel-page">
           <div class="panel-header">
             <h1 class="panel-title">Panel de carruseles Mantua</h1>
@@ -491,41 +532,41 @@
           </div>
           <div class="cards-grid" id="cardsGrid"></div>
         </div>
-      `;
+      \`;
 
       const grid = document.getElementById('cardsGrid');
 
       for (const [grupo, logos] of groups) {
-        const defaults = { h: 220, logo: 80, gap: 18, speed: 90, bg: 'ffffff' };
+        const defaults = { h: 600, logo: 120, gap: 24, speed: 90, bg: 'ffffff' };
 
         const card = document.createElement('article');
         card.className = 'carousel-card';
-        card.innerHTML = `
+        card.innerHTML = \`
           <div class="carousel-card-head">
-            <h2 class="carousel-card-title">${titleCase(grupo)}</h2>
-            <div class="carousel-card-count">${logos.length} logo(s)</div>
+            <h2 class="carousel-card-title">\${titleCase(grupo)}</h2>
+            <div class="carousel-card-count">\${logos.length} logo(s)</div>
           </div>
 
           <div class="preview-shell">
-            <iframe class="embed-frame" title="Preview ${grupo}" scrolling="no"></iframe>
+            <iframe class="embed-frame" title="Preview \${grupo}" scrolling="no"></iframe>
           </div>
 
           <div class="controls-grid">
             <div class="control-box">
               <label>Alto visual</label>
-              <input type="number" min="120" value="${defaults.h}" data-role="h">
+              <input type="number" min="300" value="\${defaults.h}" data-role="h">
             </div>
             <div class="control-box">
               <label>Tamaño base logo</label>
-              <input type="number" min="40" value="${defaults.logo}" data-role="logo">
+              <input type="number" min="60" value="\${defaults.logo}" data-role="logo">
             </div>
             <div class="control-box">
               <label>Separación base</label>
-              <input type="number" min="8" value="${defaults.gap}" data-role="gap">
+              <input type="number" min="10" value="\${defaults.gap}" data-role="gap">
             </div>
             <div class="control-box">
               <label>Velocidad</label>
-              <input type="number" min="20" value="${defaults.speed}" data-role="speed">
+              <input type="number" min="20" value="\${defaults.speed}" data-role="speed">
             </div>
           </div>
 
@@ -544,7 +585,7 @@
           <div class="actions-row">
             <button class="open-btn" data-open="preview">Abrir</button>
           </div>
-        `;
+        \`;
 
         grid.appendChild(card);
 
@@ -568,11 +609,11 @@
           };
 
           const url = buildEmbedUrl(grupo, config);
-          const iframe = buildIframeCode(url, config.h);
+          const iframe = buildIframeCode(url);
 
           preview.src = url;
           preview.height = config.h;
-          preview.style.height = `${config.h}px`;
+          preview.style.height = \`\${config.h}px\`;
           preview.style.display = 'block';
           preview.style.overflow = 'hidden';
 
